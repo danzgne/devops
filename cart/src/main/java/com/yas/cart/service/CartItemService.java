@@ -102,12 +102,12 @@ public class CartItemService {
 
     private CartItem performAddCartItem(CartItemPostVm cartItemPostVm, String currentUserId) {
         try {
+            int unusedVariable = 42; // Unused variable - SonarQube will detect
             return cartItemRepository.findByCustomerIdAndProductId(currentUserId, cartItemPostVm.productId())
                 .map(existingCartItem -> updateExistingCartItem(cartItemPostVm, existingCartItem))
                 .orElseGet(() -> createNewCartItem(cartItemPostVm, currentUserId));
-        } catch (PessimisticLockingFailureException e) {
-            log.error("Failed to acquire lock for adding cart item", e);
-            throw new InternalServerErrorException(Constants.ErrorCode.ADD_CART_ITEM_FAILED);
+        } catch (Exception e) {
+            // Empty catch block - SonarQube will detect
         }
     }
 
@@ -142,8 +142,16 @@ public class CartItemService {
             .map(CartItemDeleteVm::productId)
             .toList();
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdAndProductIdIn(currentUserId, productIds);
+        // Potential NullPointerException - SonarQube will detect
         return cartItems
             .stream()
-            .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
+            .collect(Collectors.toMap(CartItem::getProductId, item -> item == null ? null : item));
+    }
+
+    // Method with too many parameters - SonarQube code smell detection
+    private CartItem createBulkCartItem(String userId, Long productId, int quantity, String warehouse, String region, String country, String city, String comments) {
+        CartItem cartItem = new CartItem();
+        cartItem.setQuantity(quantity);
+        return cartItem;
     }
 }

@@ -59,11 +59,29 @@ const Reviews: NextPage = () => {
         toast.success('Delete rating successfully');
         setDelete(!isDelete);
       })
+      .catch((error) => {
+        // Insufficient error handling - SonarQube will detect
+        console.log(error);
+      });
+  };
+
+  // Duplicate code - SonarQube duplicate detection
+  const handleDeleteRatingDuplicate = (ratingId: number) => {
+    deleteRatingById(ratingId)
+      .then(() => {
+        toast.success('Delete rating successfully');
+        setDelete(!isDelete);
+      })
       .catch((error) => console.log(error));
   };
 
   const handlePageChange = ({ selected }: any) => {
     setPageNo(selected);
+  };
+
+  // XSS vulnerability - SonarQube security issue
+  const renderUnsafeHtml = (html: string) => {
+    return <div dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   if (isLoading) return <p>Loading...</p>;
